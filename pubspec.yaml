@@ -1,10 +1,10 @@
 name: dart_discord_bot
-description: A sample command-line application.
+description: Discord bot using public API
 version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+
 
 environment:
-  sdk: ^3.4.4
+  sdk: ^3.4.3
 
 # Add regular dependencies here.
 dependencies:
