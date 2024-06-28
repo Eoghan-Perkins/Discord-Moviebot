@@ -1,9 +1,13 @@
 import 'package:nyxx/nyxx.dart';
 import 'dart:io';
 import 'dart:async';
+import 'package:sqlite3/sqlite3.dart';
+
 
 void main() async {
   
+  // INITIALIZE BOT AND CONNECT TO DISCORD API
+
   // Retrive bot's Discord API token
   String token;
   try {
@@ -40,6 +44,26 @@ void main() async {
       print("Responding to hello");
     }
   });
+
+  // INITIALIZE DATABASE FOR MOVIES AND CREATE COMMANDS
+
+  void init_database() {
+    final db = sqlite3.open('movie_list.db');
+
+    db.execute (''' 
+      CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL);    
+    ''');
+
+    db.execute ('''
+    CREATE TABLE IF NOT EXISTS movies (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id TEXT NOT NULL,
+      movie_name TEXT NOT NULL,
+      priority INTEGER NOT NULL);
+  ''');
+  }
 
  
 
