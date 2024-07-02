@@ -1,4 +1,5 @@
 import 'package:sqlite3/sqlite3.dart';
+import 'dart:io';
 
 void initDatabase() {
     final db = sqlite3.open('movies.db');
@@ -74,5 +75,14 @@ void removeMovie(String channelId, String title){
   ''', [channelId, title]);
 
   db.dispose();
+
+}
+
+void report(String reportText, String userID){
+  final file = File('reports.txt');
+  final ts = DateTime.now().toIso8601String();
+  final entry = '[$ts] User: $userID\n$reportText\n\n';
+
+  file.writeAsStringSync(entry, mode: FileMode.append);
 
 }
