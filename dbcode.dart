@@ -64,3 +64,15 @@ void upvote(String channelId, String title) {
 
   db.dispose();
 }
+
+void removeMovie(String channelId, String title){
+  final db = sqlite3.open('movies.db');
+
+  db.execute('''
+    DELETE FROM movies
+    WHERE channel_id = ? AND film_title = ?
+  ''', [channelId, title]);
+
+  db.dispose();
+
+}
