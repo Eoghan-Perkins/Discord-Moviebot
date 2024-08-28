@@ -1,4 +1,5 @@
 import 'package:nyxx/nyxx.dart';
+
 import 'dart:io';
 import '../dbcode.dart';
 
@@ -22,6 +23,8 @@ void main() async {
   initDatabase();
   
   // Access the Discord API
+  
+  
   final bot = NyxxFactory.createNyxxWebsocket(token, GatewayIntents.allUnprivileged)
     ..registerPlugin(Logging())
     ..registerPlugin(CliIntegration())
@@ -29,7 +32,8 @@ void main() async {
 
   print("Bot Running");
   
-  // Print Hello message to channel upon bot arrival
+  // Print Hello message to channel upon bot arrival - REMOVED FROM RELEASE
+  /*
   bot.eventsWs.onGuildCreate.listen((event) {
     for (var channel in event.guild.channels) {
       if (channel is ITextGuildChannel) {
@@ -38,6 +42,7 @@ void main() async {
       }
     }
   });
+  */
 
   // RESPOND TO BOT MESSAGES
   
@@ -45,8 +50,27 @@ void main() async {
     final channelId = event.message.channel.id.toString();
     final guildId = event.message.guild?.id.toString();
     final authorId = event.message.author.id.toString();
+    final botUserId = bot.self.id;
+    // Respond to bot mentions in message (tag bot to interact)
+    // If bot is not mentioned, failure
+    if(!event.message.mentions.any((mention) => mention.id == botUserId)){
+      return;
+    }
     
-    if (event.message.content.startsWith('!moviebot') ) {
+    final content = event.message.content.replaceFirst('<@${bot.self.id}>', '').trim();
+    final args = content.split(' ');
+
+    // Check if bot is tagged with empty message 
+    if (args.isEmpty){
+      print("No message recieved");
+      return; 
+    }
+
+    // Bot orders should be the first token in a message
+    final command = args[0].toLowerCase();
+    final commandArgs = args.sublist(1);
+
+    if (command == '!moviebot') {
       try {
         final greeting = await File('greeting.txt').readAsLines();
         
@@ -57,16 +81,16 @@ void main() async {
       }
     }
     
-    if (event.message.content.startsWith('!addmovie')) {
-        final args = event.message.content.split(' ');
-        final title = args.sublist(1).join(' ');
-        final userId = event.message.author.id.toString();
+    // Add movie to queue
+    if (command == '!addmovie') {
         
         // Only add movie to queue if title is provided
-        if (args.length < 2){
+        if (commandArgs.isEmpty){
           print('Film failed to add - no title');
           event.message.channel.sendMessage(MessageBuilder.content('Movie not added to watch queue - No title provided!'));
         } else {
+          final title = commandArgs.join(' ');
+          final userId = event.message.author.id.toString();
           print('Adding film to queue');
           addMovie(userId, channelId, title, 1);
           event.message.channel.sendMessage(MessageBuilder.content('Movie added to queue!'));
@@ -74,7 +98,8 @@ void main() async {
         
     }
     
-    if (event.message.content.startsWith('!cq')) {
+    // Display movie queue
+    if (command == '!cq') {
       final films = getFilms(channelId);
       final result = films.map((film) => '${film['film_title']} - ${film['rank']} Votes').join('\n');
       
@@ -83,9 +108,9 @@ void main() async {
     }
 
     // Upvote Movie
-    if (event.message.content.startsWith('!upvote')) {
-      final args = event.message.content.split(' ');
-      final film = args.sublist(1).join(' ');
+    if (command == '!upvote') {
+      
+      final film = commandArgs.sublist(1).join(' ');
       
       print('Upvoting $film');
       upvote(channelId, film);
@@ -93,19 +118,19 @@ void main() async {
     }
 
     // Remove movie from database
-    if (event.message.content.startsWith('!removie')){
-      final args = event.message.content.split(' ');
-      if(args.length < 2){
+    if (command == '!removie'){
+      
+      if(commandArgs.isEmpty){
         print('Cannot remove from database - No title provided');
         event.message.channel.sendMessage(MessageBuilder.content('Cannot Remove Movie - No Title Provided'));
       } else {
-        final title = args.sublist(1).join(' ');
+        final title = commandArgs.sublist(1).join(' ');
 
         // FIX: Movie removal privedlges restricted to server admin
         // Troubleshoot below commented out code
         if (guildId != null){
-          final guild = bot.guilds[guildId];
-          final member = await guild?.fetchMember(Snowflake(authorId));
+          //final guild = bot.guilds[guildId];
+          //final member = await guild?.fetchMember(Snowflake(authorId));
 
           //if(member != null && member.roles.any((role) => guild!.roles[role]?.permissions.administrator ?? false)) {
               print('Removing movie from queue');
@@ -118,11 +143,11 @@ void main() async {
         }
       }
 
-      if(event.message.content.startsWith('!report')){
+      if(command == '!report'){
         final args = event.message.content.split(' ');
         
         if(args.length > 1 && args.length < 50){
-          final text = args.sublist(1).join(' ');
+          final text = commandArgs.join(' ');
           print('Report Recieved');
           report(text, authorId);
           event.message.channel.sendMessage(MessageBuilder.content('Thanks for your feedback!'));
