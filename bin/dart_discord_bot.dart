@@ -1,5 +1,4 @@
 import 'package:nyxx/nyxx.dart';
-
 import 'dart:io';
 import '../dbcode.dart';
 
@@ -23,8 +22,6 @@ void main() async {
   initDatabase();
   
   // Access the Discord API
-  
-  
   final bot = NyxxFactory.createNyxxWebsocket(token, GatewayIntents.allUnprivileged)
     ..registerPlugin(Logging())
     ..registerPlugin(CliIntegration())
@@ -45,7 +42,6 @@ void main() async {
   */
 
   // RESPOND TO BOT MESSAGES
-  
   bot.eventsWs.onMessageReceived.listen((event) async {
     final channelId = event.message.channel.id.toString();
     final guildId = event.message.guild?.id.toString();
@@ -110,7 +106,7 @@ void main() async {
     // Upvote Movie
     if (command == '!upvote') {
       
-      final film = commandArgs.sublist(1).join(' ');
+      final film = commandArgs.join(' ');
       
       print('Upvoting $film');
       upvote(channelId, film);
@@ -124,7 +120,7 @@ void main() async {
         print('Cannot remove from database - No title provided');
         event.message.channel.sendMessage(MessageBuilder.content('Cannot Remove Movie - No Title Provided'));
       } else {
-        final title = commandArgs.sublist(1).join(' ');
+        final title = commandArgs.join(' ');
 
         // FIX: Movie removal privedlges restricted to server admin
         // Troubleshoot below commented out code
