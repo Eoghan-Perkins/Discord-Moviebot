@@ -43,10 +43,12 @@ void main() async {
 
   // RESPOND TO BOT MESSAGES
   bot.eventsWs.onMessageReceived.listen((event) async {
+    
     final channelId = event.message.channel.id.toString();
     final guildId = event.message.guild?.id.toString();
-    final authorId = event.message.author.id.toString();
+    final authorId = event.message.author.username.toString();
     final botUserId = bot.self.id;
+
     // Respond to bot mentions in message (tag bot to interact)
     // If bot is not mentioned, failure
     if(!event.message.mentions.any((mention) => mention.id == botUserId)){
