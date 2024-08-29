@@ -25,11 +25,12 @@ void initDatabase() {
 
 void addMovie(String userID, String channelId, String title, int rank){
   final db = sqlite3.open("movies.db");
+  final name = title.toLowerCase();
 
   db.execute('''
     INSERT INTO movies (user_id, channel_id, film_title, rank)
     VALUES (?, ?, ?, ?)
-    ''', [userID, channelId, title, rank]);
+    ''', [userID, channelId, name, rank]);
 
   
   db.dispose();
@@ -54,16 +55,34 @@ List<Map <String, dynamic>> getFilms(String channelId) {
   return films;
 }
 
-void upvote(String channelId, String title) {
-  final db =sqlite3.open('movies.db');
+int upvote(String channelId, String title) {
+  
+  // Open db
+  final db = sqlite3.open('movies.db');
+  
+  // Check if movie exists in queue already
+  final ResultSet rs = db.select(
+    'SELECT COUNT(*) as count FROM movies WHERE film_title = ?', [title]
+  );
 
+  final int count = rs.first['count'];
+
+  // If movie not in queue, return false
+  if(count == 0) {
+    db.dispose();
+    return 0;
+  }
+
+  // Otherwise, proceed with upvote
   db.execute('''
     UPDATE movies
     SET rank = rank + 1
     WHERE channel_id = ? AND film_title = ?
   ''', [channelId, title]);
 
+  // Close db, return true
   db.dispose();
+  return 1;
 }
 
 void removeMovie(String channelId, String title){

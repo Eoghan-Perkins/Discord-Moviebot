@@ -108,9 +108,16 @@ void main() async {
       
       final film = commandArgs.join(' ');
       
-      print('Upvoting $film');
-      upvote(channelId, film);
-      event.message.channel.sendMessage(MessageBuilder.content('$film upvoted'));
+      
+      final res = upvote(channelId, film);
+      if(res==1) {
+        print('Upvoting $film');
+        event.message.channel.sendMessage(MessageBuilder.content('$film upvoted'));
+      } else {
+        print('Upvote failure, no presence in queue.');
+        event.message.channel.sendMessage(MessageBuilder.content('Could not upvote, make sure you type in film'
+          ' name correctly and that it exists in queue.'));
+      }
     }
 
     // Remove movie from database
