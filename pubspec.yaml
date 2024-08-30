@@ -8,10 +8,10 @@ environment:
 dependencies:
   # path: ^1.8.0
     nyxx: ^5.1.1
-    flutter:
-      sdk: flutter
+    #flutter:
+     # sdk: flutter
     sqlite3: ^2.4.4
-    sqlite3_flutter_libs: ^0.5.24
+    #sqlite3_flutter_libs: ^0.5.24
     ffi: ^2.1.2
     http: ^0.13.3
 
