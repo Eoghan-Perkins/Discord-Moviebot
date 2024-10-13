@@ -2,6 +2,7 @@
 # Created by `dart pub`
 .dart_tool/
 cfigtoken.txt
+.env
 greeting.txt
 movies.db
 reports.txt

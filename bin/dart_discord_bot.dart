@@ -41,7 +41,7 @@ void main() async {
   });
   */
 
-  // RESPOND TO BOT MESSAGES
+  // COMMAND HANDLER
   bot.eventsWs.onMessageReceived.listen((event) async {
     
     final channelId = event.message.channel.id.toString();
@@ -109,9 +109,8 @@ void main() async {
     if (command == '!upvote') {
       
       final film = commandArgs.join(' ');
-      
-      
       final res = upvote(channelId, film);
+      
       if(res==1) {
         print('Upvoting $film');
         event.message.channel.sendMessage(MessageBuilder.content('$film upvoted'));
@@ -131,7 +130,7 @@ void main() async {
       } else {
         final title = commandArgs.join(' ');
 
-        // FIX: Movie removal privedlges restricted to server admin
+        // FIX: Movie removal privledges restricted to server admin
         // Troubleshoot below commented out code
         if (guildId != null){
           //final guild = bot.guilds[guildId];
