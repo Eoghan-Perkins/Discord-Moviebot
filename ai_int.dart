@@ -3,6 +3,62 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:dotenv/dotenv.dart' as dotenv;
 
+Future<String> getAiRecs(String tags) async {
+
+}
+
+String genPrompt(String tags, List<Map<String, dynamic>> movies) {
+
+}
+
+Future<String> callAIAPI(String prompt) async {
+
+    // Load env variable for ai API key, set up request headers and URL for AI API
+    var env = dotenv.DotEnv(includePlatformEnvironment: true)..load();
+    final apiKey = env['AI_API_KEY'];
+    final baseUrl = 'https://api.openai.com/v1/completions';
+
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authroization': 'Bearer $apiKey',
+    };
+
+    // Request body
+    final body = jsonEncode( {
+      'model': 'text-davinci-003',
+      'prompt': prompt,
+      'max_tokens': 250,
+      'temperature': 0.7,
+      'n': 1,
+      'stop': null,
+    });
+
+    // POST request
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: headers,
+      body: body,
+    );
+
+    // If good response
+    if (response.statusCode == 200) {
+      // Pull answer from JSON response data
+      final data = jsonDecode(response.body);
+      // Get the text generated via the response and return it
+      final text = data['choices'][0]['text'].trim();
+      return text;
+
+    } else {
+      
+      // API call failure
+      print('Error Calling AI API: ${response.statusCode} ${response.body}');
+      return 'API call failed.';
+
+    }
+
+}
+
+
 Future<List<Map<String, dynamic>>> fetchMoviesFromTMDB(String tags) async {
     
     // Load .env variables, use to create get http get request
