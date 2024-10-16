@@ -3,16 +3,19 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:dotenv/dotenv.dart' as dotenv;
 
+// Function to be called when user issues the appropriate command - mother function for all others in file
 Future<String> getAiRecs(String tags) async {
 
     // Make sure API call returns something before executing rest of method
     try {
       final movies = await fetchMoviesFromTMDB(tags);
+      // Good API call, no movies returned
       if(movies.isEmpty){
         return 'No Movies Found Matching These Tags.';
       }
-      
+      // Pass the returned movies as an argument to the prompt generator
       final prompt = genPrompt(tags, movies);
+      // Use the prompt as an argument to the callAIAPI method to get personalized recs
       final response = await callAIAPI(prompt);
       return response;
     } catch (e) {
@@ -21,12 +24,31 @@ Future<String> getAiRecs(String tags) async {
     }
 }
 
+// Generates the prompt given to the AI
 String genPrompt(String tags, List<Map<String, dynamic>> movies) {
 
-    final result = '';
-    return result;
+    // Create a map of each movie associated with the desciption provided by the TMDb API
+    final movieList = movies.map((movie) {
+      return '- Film: ${movie['title']}\n Synopsis: ${movie['overview']}\n';
+    }).join('\n');
+
+    // Create and return the prompt
+    final prompt =  ''' 
+
+      Acting as a movie-buff, create a personalized reccomendation for each movie listed below, using the
+      supplied tags, also below. Acting friendly and knowledgable, rank the movies based on which you think
+      is most similar to the provided tags, and the reasons why.
+
+      Movies: $movieList
+
+      Tags: $tags
+
+    ''';
+
+    return prompt;
 }
 
+// Sends the prompt to the AI, and returns the AI output
 Future<String> callAIAPI(String prompt) async {
 
     // Load env variable for ai API key, set up request headers and URL for AI API
@@ -36,7 +58,7 @@ Future<String> callAIAPI(String prompt) async {
 
     final headers = {
       'Content-Type': 'application/json',
-      'Authroization': 'Bearer $apiKey',
+      'Authorization': 'Bearer $apiKey',
     };
 
     // Request body
@@ -72,7 +94,7 @@ Future<String> callAIAPI(String prompt) async {
     }
 }
 
-
+// Get a list of randomly chosen movies based on user-supplied tags
 Future<List<Map<String, dynamic>>> fetchMoviesFromTMDB(String tags) async {
     
     // Load .env variables, use to create get http get request
