@@ -5,10 +5,26 @@ import 'package:dotenv/dotenv.dart' as dotenv;
 
 Future<String> getAiRecs(String tags) async {
 
+    // Make sure API call returns something before executing rest of method
+    try {
+      final movies = await fetchMoviesFromTMDB(tags);
+      if(movies.isEmpty){
+        return 'No Movies Found Matching These Tags.'
+      }
+      
+      final prompt = genPrompt(tags, movies);
+      final response = await callAIAPI(prompt);
+      return response;
+    } catch (e) {
+      print('Error: , $e');
+      return 'Error Occurred While Attempting to Generate Movie Reccomendations';
+    }
 }
 
 String genPrompt(String tags, List<Map<String, dynamic>> movies) {
 
+    final result = '';
+    return result;
 }
 
 Future<String> callAIAPI(String prompt) async {
@@ -53,9 +69,7 @@ Future<String> callAIAPI(String prompt) async {
       // API call failure
       print('Error Calling AI API: ${response.statusCode} ${response.body}');
       return 'API call failed.';
-
     }
-
 }
 
 
