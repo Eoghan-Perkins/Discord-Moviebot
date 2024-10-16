@@ -9,7 +9,7 @@ Future<String> getAiRecs(String tags) async {
     try {
       final movies = await fetchMoviesFromTMDB(tags);
       if(movies.isEmpty){
-        return 'No Movies Found Matching These Tags.'
+        return 'No Movies Found Matching These Tags.';
       }
       
       final prompt = genPrompt(tags, movies);
