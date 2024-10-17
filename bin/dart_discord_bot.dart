@@ -1,11 +1,13 @@
+
 import 'package:nyxx/nyxx.dart';
 import 'dart:io';
 import '../dbcode.dart';
+import'../ai_int.dart';
 
 void main() async {
   
   // INITIALIZE BOT AND CONNECT TO DISCORD API
-
+  
   // Retrive bot's Discord API token
   String token;
   try {
@@ -159,6 +161,34 @@ void main() async {
           print('Report submission failed. Please ensure your report is 50 words or less');
           event.message.channel.sendMessage(MessageBuilder.content('Please include text regarding the problem'));
         }
+      }
+
+      // AI reccomendation function
+      if (command == '!rec') {
+        
+        // If reccomend called without arguments
+        if (commandArgs.isEmpty){
+          print("No arguments supplied for reccomendation function.");
+          event.message.channel.sendMessage(MessageBuilder.content("No tags provided for reccomendation! Please supply a vibe."));
+        } else {
+          
+          // Build the tag string
+          var tags = "";
+          for (int i = 0; i < commandArgs.length-1; i++) {
+            tags += ('${commandArgs[i]},');
+          }
+          tags += commandArgs.last;
+
+          // Call the method
+          print("Calling for AI Assistance");
+          String content = await getAiRecs(tags);
+          if(content.isEmpty){
+            print("No content recieved from !rec");
+          }
+          event.message.channel.sendMessage(MessageBuilder.content(content));
+
+        }
+
       }
     }
 
